@@ -11,6 +11,9 @@ export default {
 
     theme: {
         extend: {
+            colors: {
+                laravel: '#DC2626', // Change or add the 'danger' color
+              },
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },
