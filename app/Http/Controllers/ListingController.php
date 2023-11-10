@@ -23,30 +23,31 @@ class ListingController extends Controller
     }
 
     //store data from the create form 
-    public function store(Request $request){
+    public function store(Request $request)
+{
+    $formField = $request->validate([
+        'title' => 'required',
+        'company' => ['required', Rule::unique('listings', 'company')],
+        'location' => 'required',
+        'email' => ['required', 'email'],
+        'website' => 'required',
+        'tags' => 'required',
+        'description' => 'required',
+    ]);
 
-        $formField = $request->validate([
-            'title'=>'required',
-            'company'=>['required', Rule::unique('listings', 'company')],
-            'location'=>'required',
-            'email'=> ['required', 'email'],
-            'website'=>'required',
-            'tags'=>'required',
-            'description'=>'required'
+    $user = auth()->user();
 
-        ]);
-
-
-        if($request->hasFile('logo')) {
-            $formField ['logo'] = $request->file('logo')->store('logos', 'public');
-        }
-
-        $formField['user_id'] = auth()->id();
-
-
-        Listing::create($formField);
-        return redirect('/')->with('message', 'Listing Created Successfully!!!');
+    // Handle logo image upload
+    if ($request->hasFile('logo')) {
+        $imagePath = $request->file('logo')->store('logos', 'public');
+        $formField['logo'] = $imagePath;
     }
+
+    // Create the listing associated with the user
+    $user->listings()->create($formField);
+
+    return redirect('/')->with('message', 'Listing Created Successfully!!!');
+}
 
     //show single listing
     public function show(listing $listing) {
@@ -66,6 +67,11 @@ class ListingController extends Controller
 
     //update the  data from the edit form 
     public function update(Request $request, Listing $listing){
+
+        //make sure logged in user is the owner
+        if($listing->user_id != auth()->id()) {
+            abort(403, 'Unathorized Action');
+        };
 
         $formField = $request->validate([
             'title'=>'required',
@@ -90,6 +96,9 @@ class ListingController extends Controller
 
     //Delete Listing
     public function destroy(Listing $listing) {
+        if($listing->user_id != auth()->id()) {
+            abort(403, 'Unathorized Action');
+        };
         $listing->delete();
         return redirect('/')->with('message', 'Listing deleted successfully!!!');
 
@@ -98,7 +107,7 @@ class ListingController extends Controller
 
     public function manage() {
         return view('listings.manage', [
-            'listings' => auth()->user()->listings,
+            'listings' => auth()->user()->listings()->get()
         ]);
     }
     
