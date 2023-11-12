@@ -1,3 +1,6 @@
+
+![afrijob](https://github.com/Samuelchigozie/afrijobs/assets/59323050/9cb459e8-5dac-423b-95b0-1108acef95c7)
+
 # Afrijob
 
 Afrijob is a web application built with PHP and the Laravel framework, designed to facilitate job listings and create opportunities for job seekers across Africa. The primary goal of Afrijob is to connect employers and job seekers, making the job search and recruitment process more accessible and efficient.
